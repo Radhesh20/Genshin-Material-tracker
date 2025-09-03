@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
+import { useLocalStorage } from './hooks/useLocalStorage';
 
 interface Material {
   id: string;
@@ -9,7 +10,7 @@ interface Material {
 }
 
 function App() {
-  const [materials, setMaterials] = useState<Material[]>([]);
+  const [materials, setMaterials] = useLocalStorage<Material[]>('genshin-materials', []);
   const [newMaterial, setNewMaterial] = useState({ name: '', needed: 0 });
 
   const addMaterial = () => {
