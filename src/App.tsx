@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import Footer from './components/Footer';
 
 interface Material {
   id: string;
@@ -195,6 +196,7 @@ function App() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
