@@ -14,6 +14,8 @@ function App() {
   const [materials, setMaterials] = useLocalStorage<Material[]>('genshin-materials', []);
   const [newMaterial, setNewMaterial] = useState({ name: '', needed: 0 });
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingMaterial, setEditingMaterial] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<{ collected: number; needed: number }>({ collected: 0, needed: 0 });
 
   // Calculate items per page based on screen size
   const itemsPerPage = 6; // 2 rows of 3 items each for optimal viewing
@@ -56,6 +58,35 @@ function App() {
     ));
   };
 
+  const decrementMaterial = (id: string, amount: number) => {
+    setMaterials(materials.map(material => 
+      material.id === id 
+        ? { ...material, collected: Math.max(material.collected - amount, 0) }
+        : material
+    ));
+  };
+
+  const startEditing = (material: Material) => {
+    setEditingMaterial(material.id);
+    setEditValues({ collected: material.collected, needed: material.needed });
+  };
+
+  const saveEdit = (id: string) => {
+    setMaterials(materials.map(material => 
+      material.id === id 
+        ? { 
+            ...material, 
+            collected: Math.max(0, Math.min(editValues.collected, editValues.needed)),
+            needed: Math.max(1, editValues.needed)
+          }
+        : material
+    ));
+    setEditingMaterial(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingMaterial(null);
+  };
   const deleteMaterial = (id: string) => {
     setMaterials(materials.filter(material => material.id !== id));
   };
@@ -153,51 +184,122 @@ function App() {
                         </button>
                       </div>
 
-                      {/* Progress Info */}
-                      <div className="mb-3">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-300 text-sm">Progress</span>
-                          <span className={`font-bold text-sm ${isComplete ? 'text-green-400' : 'text-white'}`}>
-                            {material.collected} / {material.needed}
-                          </span>
+                      {/* Progress Info or Edit Mode */}
+                      {editingMaterial === material.id ? (
+                        <div className="mb-3">
+                          <div className="space-y-3">
+                            <div>
+                              <label className="text-gray-300 text-sm block mb-1">Collected</label>
+                              <input
+                                type="number"
+                                value={editValues.collected}
+                                onChange={(e) => setEditValues({ ...editValues, collected: parseInt(e.target.value) || 0 })}
+                                className="w-full px-3 py-2 bg-black/30 border border-cyan-500/30 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/20"
+                                min="0"
+                                max={editValues.needed}
+                              />
+                            </div>
+                            <div>
+                              <label className="text-gray-300 text-sm block mb-1">Needed</label>
+                              <input
+                                type="number"
+                                value={editValues.needed}
+                                onChange={(e) => setEditValues({ ...editValues, needed: parseInt(e.target.value) || 1 })}
+                                className="w-full px-3 py-2 bg-black/30 border border-cyan-500/30 rounded-lg text-white text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/20"
+                                min="1"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 mt-3">
+                            <button
+                              onClick={() => saveEdit(material.id)}
+                              className="flex-1 py-2 bg-gradient-to-r from-green-600 to-green-500 rounded-lg font-semibold hover:from-green-500 hover:to-green-400 transition-all duration-200 text-sm"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              className="flex-1 py-2 bg-gradient-to-r from-gray-600 to-gray-500 rounded-lg font-semibold hover:from-gray-500 hover:to-gray-400 transition-all duration-200 text-sm"
+                            >
+                              Cancel
+                            </button>
+                          </div>
                         </div>
+                      ) : (
+                        <div className="mb-3">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-gray-300 text-sm">Progress</span>
+                            <button
+                              onClick={() => startEditing(material)}
+                              className="font-bold text-sm hover:text-cyan-300 transition-colors cursor-pointer"
+                              title="Click to edit"
+                            >
+                              <span className={isComplete ? 'text-green-400' : 'text-white'}>
+                                {material.collected} / {material.needed}
+                              </span>
+                            </button>
+                          </div>
                         
-                        {/* Progress Bar */}
-                        <div className="w-full bg-gray-800 rounded-full h-2.5 overflow-hidden">
-                          <div
-                            className={`h-full transition-all duration-500 rounded-full ${
-                              isComplete 
-                                ? 'bg-gradient-to-r from-green-400 to-green-500' 
-                                : 'bg-gradient-to-r from-cyan-400 to-purple-500'
-                            }`}
-                            style={{ width: `${progress}%` }}
-                          ></div>
-                        </div>
+                          {/* Progress Bar */}
+                          <div className="w-full bg-gray-800 rounded-full h-2.5 overflow-hidden">
+                            <div
+                              className={`h-full transition-all duration-500 rounded-full ${
+                                isComplete 
+                                  ? 'bg-gradient-to-r from-green-400 to-green-500' 
+                                  : 'bg-gradient-to-r from-cyan-400 to-purple-500'
+                              }`}
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                          </div>
                         
-                        <div className="text-right mt-1">
-                          <span className={`text-xs ${isComplete ? 'text-green-400' : 'text-gray-400'}`}>
-                            {progress.toFixed(1)}%
-                          </span>
+                          <div className="text-right mt-1">
+                            <span className={`text-xs ${isComplete ? 'text-green-400' : 'text-gray-400'}`}>
+                              {progress.toFixed(1)}%
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
-                      {/* Action Buttons */}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => incrementMaterial(material.id, 1)}
-                          disabled={material.collected >= material.needed}
-                          className="flex-1 py-2.5 bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-xl font-semibold hover:from-cyan-500 hover:to-cyan-400 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:scale-100 text-sm"
-                        >
-                          +1
-                        </button>
-                        <button
-                          onClick={() => incrementMaterial(material.id, 5)}
-                          disabled={material.collected >= material.needed}
-                          className="flex-1 py-2.5 bg-gradient-to-r from-purple-600 to-purple-500 rounded-xl font-semibold hover:from-purple-500 hover:to-purple-400 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:scale-100 text-sm"
-                        >
-                          +5
-                        </button>
-                      </div>
+                      {/* Action Buttons - Only show if not editing */}
+                      {editingMaterial !== material.id && (
+                        <div className="space-y-2">
+                          {/* Increment Buttons */}
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => incrementMaterial(material.id, 1)}
+                              disabled={material.collected >= material.needed}
+                              className="flex-1 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-lg font-semibold hover:from-cyan-500 hover:to-cyan-400 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:scale-100 text-sm"
+                            >
+                              +1
+                            </button>
+                            <button
+                              onClick={() => incrementMaterial(material.id, 5)}
+                              disabled={material.collected >= material.needed}
+                              className="flex-1 py-2 bg-gradient-to-r from-purple-600 to-purple-500 rounded-lg font-semibold hover:from-purple-500 hover:to-purple-400 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:scale-100 text-sm"
+                            >
+                              +5
+                            </button>
+                          </div>
+                          
+                          {/* Decrement Buttons */}
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => decrementMaterial(material.id, 1)}
+                              disabled={material.collected <= 0}
+                              className="flex-1 py-2 bg-gradient-to-r from-red-600 to-red-500 rounded-lg font-semibold hover:from-red-500 hover:to-red-400 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:scale-100 text-sm"
+                            >
+                              -1
+                            </button>
+                            <button
+                              onClick={() => decrementMaterial(material.id, 5)}
+                              disabled={material.collected <= 0}
+                              className="flex-1 py-2 bg-gradient-to-r from-orange-600 to-orange-500 rounded-lg font-semibold hover:from-orange-500 hover:to-orange-400 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 disabled:scale-100 text-sm"
+                            >
+                              -5
+                            </button>
+                          </div>
+                        </div>
+                      )}
 
                       {isComplete && (
                         <div className="mt-3 text-center">
