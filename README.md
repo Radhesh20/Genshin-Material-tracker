@@ -15,6 +15,14 @@ This application is built with React, TypeScript, and Tailwind CSS, and it uses 
   - **Pagination:** If you have a long list of materials, the app will paginate them for easier viewing.
   - **Local Storage:** Your material list is saved in your browser's local storage, so your data will be there when you come back.
 
+## Releases 
+
+If you just want to use the application without setting up a development environment, you can download the latest pre-built version from the Releases page.
+
+[Go to Downloads]()
+
+Simply download the appropriate installer for your operating system (.exe for Windows).
+
 ## Getting Started
 
 To get a local copy up and running, follow these simple steps.
