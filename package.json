@@ -25,6 +25,8 @@
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.18",
     "concurrently": "^9.2.1",
+    "electron": "^32.0.0",
+    "electron-builder": "^25.0.0",
     "eslint": "^9.9.1",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",
@@ -47,39 +49,49 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "node_modules/**/*"
+      "!electron/*.ts",
+      "!src",
+      "!**/*.map"
+    ],
+    "extraResources": [
+      {
+        "from": "public/favicon.svg",
+        "to": "favicon.svg"
+      }
     ],
     "mac": {
       "category": "public.app-category.utilities",
+      "icon": "public/favicon.svg",
       "target": [
         {
           "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
+          "arch": ["x64", "arm64"]
         }
       ]
     },
     "win": {
+      "icon": "public/favicon.svg",
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ]
     },
     "linux": {
+      "icon": "public/favicon.svg",
       "target": [
         {
           "target": "AppImage",
-          "arch": [
-            "x64"
-          ]
+          "arch": ["x64"]
         }
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     }
   }
 }
