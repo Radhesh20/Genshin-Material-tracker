@@ -19,7 +19,7 @@ This application is built with React, TypeScript, and Tailwind CSS, and it uses 
 
 If you just want to use the application without setting up a development environment, you can download the latest pre-built version from the Releases page.
 
-[Go to Downloads]()
+[Go to Downloads](https://github.com/Radhesh20/Genshin-Material-tracker/releases/tag/v1.0.0)
 
 Simply download the appropriate installer for your operating system (.exe for Windows).
 
