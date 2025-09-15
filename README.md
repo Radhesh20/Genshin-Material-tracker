@@ -33,10 +33,28 @@ You'll need to have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.c
     ```sh
     npm install
     ```
-3.  Run the development server
+3.  Run the web development server
     ```sh
     npm run dev
     ```
+4.  Or run the desktop application in development mode
+    ```sh
+    npm run electron:dev
+    ```
+
+## Desktop Application
+
+This application can be run as a desktop app using Electron:
+
+### Development
+- `npm run electron:dev` - Run the desktop app in development mode
+- `npm run electron` - Run the desktop app (requires built web app)
+
+### Building Desktop App
+- `npm run electron:pack` - Build the desktop app for your current platform
+- `npm run electron:dist` - Build the desktop app for distribution
+
+The built desktop applications will be available in the `dist-electron` folder.
 
 ## Technologies Used
 
@@ -45,6 +63,7 @@ You'll need to have [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.c
   - [Vite](https://vitejs.dev/)
   - [Tailwind CSS](https://tailwindcss.com/)
   - [Lucide React](https://lucide.dev/)
+  - [Electron](https://www.electronjs.org/)
 
 ## Contributing
 
